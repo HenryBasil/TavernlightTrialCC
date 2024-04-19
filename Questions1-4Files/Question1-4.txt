@@ -1,0 +1,148 @@
+--Q1:
+
+local function releaseStorage(player)
+
+	player:setStorageValue(1000, -1)
+
+end
+
+ 
+
+function onLogout(player)
+
+if player:getStorageValue(1000) == 1 then
+	
+--If we use "addEvent" with this 1000 ms delay, there is a chance that the player
+--will already be logged out when we try to access it in the "releaseStorage" function.
+--instead of using "addEvent" with a delay, we can just call the function to "releaseStorage"
+--while we have access to the player.
+		
+-- ORIGINAL LINE
+--addEvent(releaseStorage, 1000, player)
+		
+--FIX
+releaseStorage(player) 
+
+end
+
+return true
+
+end
+
+
+--Q2
+
+
+function printSmallGuildNames(memberCount)
+
+-- this method is supposed to print names of all guilds that have less than memberCount max members
+
+--ORIGINAL LINES
+--local selectGuildQuery = "SELECT name FROM guilds WHERE max_members < %d;"
+--local resultId = db.storeQuery(string.format(selectGuildQuery, memberCount))
+--local guildName = result.getString("name")
+
+--There might be some syntax errors with the original line using "selectGuildQuery", but mainly I 
+--just found it hard to read. Also, "guildName" wasn't passing along "resultId" as a parameter.
+
+--FIX
+local resultId = db.storeQuery("SELECT 'name' FROM 'guilds' WHERE 'max_members' < 'memberCount' "))
+local guildName = result.getString(resultId, "name")
+
+print(guildName)
+
+end
+
+
+Q3:
+
+--ORIGINAL LINE
+--function do_sth_with_PlayerParty(playerId, membername)
+
+--First we'll fix the name
+--FIX
+function removeMemberFromPlayerParty(playerId, membername)
+
+player = Player(playerId)
+
+local party = player:getParty()
+
+--add check to see if party > 0
+if party == 0 then
+	return
+end
+
+ 
+--I read that this is a common practice in Lua when a variable has no importance,
+--so I believe it should be here too. (Replaced "k" with "_")
+for _,v in pairs(party:getMembers()) do
+
+    if v == Player(membername) then
+
+        party:removeMember(Player(membername))
+
+    end
+
+end
+
+end
+
+
+Q4:
+
+void Game::addItemToPlayer(const std::string& recipient, uint16_t itemId)
+
+{
+
+Player* player = g_game.getPlayerByName(recipient);
+
+if (!player) {
+
+player = new Player(nullptr);
+
+if (!IOLoginData::loadPlayerByName(player, recipient)) {
+
+	//delete player before returning from function
+	delete player;
+
+	return;
+
+}
+
+}
+
+ 
+
+Item* item = Item::CreateItem(itemId);
+
+if (!item) {
+
+	//delete player before returning from function
+	delete player;
+	
+	//deleting item to be safe
+	delete item;
+	
+    return;
+
+}
+
+ 
+
+g_game.internalAddItem(player->getInbox(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+
+ 
+
+if (player->isOffline()) {
+
+    IOLoginData::savePlayer(player);
+
+}
+
+//delete player
+delete player;
+
+//deleting item to be safe
+delete item;
+
+}
