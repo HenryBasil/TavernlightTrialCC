@@ -1,0 +1,12 @@
+Module
+  name: game_tavernjump
+  description: Jump menu for Tavernlight trial
+  author: Colton Conway
+  website: -
+  
+  sandboxed: true
+  scripts: [ game_tavernjump ]
+  @onLoad: init()
+  @onUnload: terminate()
+  dependencies:
+    - game_interface
